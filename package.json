@@ -1,0 +1,34 @@
+{
+  "name": "expenza",
+  "version": "1.0.0",
+  "description": "Expense tracker app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm start\" \"npm run client\" "
+  },
+  "keywords": [],
+  "author": "Shahroz and Uvais",
+  "license": "MIT",
+  "dependencies": {
+    "@ant-design/icons": "^5.2.5",
+    "antd": "^5.8.3",
+    "axios": "^1.4.0",
+    "colors": "^1.4.0",
+    "concurrently": "^7.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "moment": "^2.29.4",
+    "mongoose": "^6.6.5",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7",
+    "punycode": "^2.3.1",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^3.4.0"
+  }
+}

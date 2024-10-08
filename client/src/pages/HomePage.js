@@ -67,11 +67,73 @@ const HomePage = () => {
     },
   ];
 
-  //getall transactions
+  //delete handler
+  const handleDelete = async (record) => {
+    try {
+      setLoading(true);
+      await axios.post("/transections/delete-transection", {
+        transacationId: record._id,
+      });
+
+      // Remove the deleted transaction from the local state
+      setAllTransection((prev) =>
+        prev.filter((tran) => tran._id !== record._id)
+      );
+      message.success("Transaction Deleted!");
+    } catch (error) {
+      console.log(error);
+      message.error("Unable to delete");
+    } finally {
+      setLoading(false); // Ensure loading is turned off in case of error
+    }
+  };
+  // form handling
+  const handleSubmit = async (values) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setLoading(true);
+      if (editable) {
+        // Update Transaction
+        const response = await axios.post("/transections/edit-transection", {
+          payload: {
+            ...values,
+            userId: user._id,
+          },
+          transacationId: editable._id,
+        });
+
+        // Update local state with the updated transaction
+        setAllTransection((prev) =>
+          prev.map((tran) => (tran._id === editable._id ? response.data : tran))
+        );
+        message.success("Transaction Updated Successfully");
+        setShowModal(false);
+      } else {
+        // Add Transaction
+        const response = await axios.post("/transections/add-transection", {
+          ...values,
+          userid: user._id,
+        });
+
+        // Update local state with the new transaction
+        setAllTransection((prev) => [...prev, response.data]);
+        message.success("Transaction Added Successfully");
+
+        // **Update the values directly from the submitted form data**
+        setShowModal(false); // Close modal after adding transaction
+        setEditable(null); // Reset editable state
+      }
+    } catch (error) {
+      setLoading(false);
+      message.error("Please fill all fields");
+    } finally {
+      setLoading(false); // Ensure loading is turned off in case of error
+    }
+  };
 
   //useEffect Hook
   useEffect(() => {
-    const getAllTransactions = async () => {
+    const fetchTransactions = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         setLoading(true);
@@ -84,58 +146,12 @@ const HomePage = () => {
         setAllTransection(res.data);
         setLoading(false);
       } catch (error) {
-        message.error("Ftech Issue With Tranction");
+        message.error("Fetch Issue With Transaction");
       }
     };
-    getAllTransactions();
-  }, [frequency, selectedDate, type, setAllTransection]);
 
-  //delete handler
-  const handleDelete = async (record) => {
-    try {
-      setLoading(true);
-      await axios.post("/transections/delete-transection", {
-        transacationId: record._id,
-      });
-      setLoading(false);
-      message.success("Transaction Deleted!");
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      message.error("unable to delete");
-    }
-  };
-
-  // form handling
-  const handleSubmit = async (values) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setLoading(true);
-      if (editable) {
-        await axios.post("/transections/edit-transection", {
-          payload: {
-            ...values,
-            userId: user._id,
-          },
-          transacationId: editable._id,
-        });
-        setLoading(false);
-        message.success("Transaction Updated Successfully");
-      } else {
-        await axios.post("/transections/add-transection", {
-          ...values,
-          userid: user._id,
-        });
-        setLoading(false);
-        message.success("Transaction Added Successfully");
-      }
-      setShowModal(false);
-      setEditable(null);
-    } catch (error) {
-      setLoading(false);
-      message.error("please fill all fields");
-    }
-  };
+    fetchTransactions();
+  }, [frequency, selectedDate, type]); // Add any dependencies that affect the fetching
 
   return (
     <Layout>
